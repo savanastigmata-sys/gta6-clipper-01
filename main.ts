@@ -26,4 +26,18 @@ try {
   process.exit(1);
 }
 
+// Refuse a malformed address instead of handing the gate a bad one:
+// VIDEO.json must parse as JSON and name the video with an https URL.
+let video;
+try {
+  video = JSON.parse(videoJson.toString('utf8'));
+} catch (err) {
+  console.error(`VIDEO.json is not valid JSON: ${(err as Error).message}`);
+  process.exit(1);
+}
+if (typeof video?.url !== 'string' || !video.url.startsWith('https://')) {
+  console.error('VIDEO.json must name a video with an https url.');
+  process.exit(1);
+}
+
 writeFileSync(join(OUTPUT_DIR, 'VIDEO.json'), videoJson);
